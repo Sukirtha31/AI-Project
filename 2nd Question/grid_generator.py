@@ -1,3 +1,5 @@
+from tracemalloc import start
+
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -21,21 +23,36 @@ def is_path_possible(grid, start, goal):
 
     return False
 
-def generate_grid(rows=10, cols=10, obstacle_prob=0.25):
-    grid = np.random.choice([0, 1], size=(rows, cols),p=[1 - obstacle_prob, obstacle_prob])
-
-    start = (random.randint(0, rows - 1), random.randint(0, cols - 1))
-    goal = (random.randint(0, rows - 1),random.randint(0, cols - 1))
-    while goal == start:
-        goal = (random.randint(0, rows - 1),random.randint(0, cols - 1))
-    grid[start] = 0
-    grid[goal] = 0
-
-    while not is_path_possible(grid, start, goal):
-        grid = np.random.choice([0, 1],size=(rows, cols),p=[1 - obstacle_prob, obstacle_prob])
-        grid[start] = 0
-        grid[goal] = 0
+def generate_grid(rows=10, cols=10, obstacle_prob=0.25, no_of_robots=1):
+    total_cells = rows * cols
+    if 2 * no_of_robots > total_cells:
+        raise ValueError("Not enough cells for unique start and goal positions.")
     
+    max_attempts = 1000
+    for attempt in range(max_attempts):
+        grid = np.random.choice([0, 1],size=(rows, cols),p=[1 - obstacle_prob, obstacle_prob])
+        positions = random.sample(range(total_cells), 2 * no_of_robots)
+        start = [
+            (pos // cols, pos % cols)
+            for pos in positions[:no_of_robots]
+        ]
+        goal = [
+            (pos // cols, pos % cols)
+            for pos in positions[no_of_robots:]
+        ]
+        for pos in start + goal:
+            grid[pos] = 0
+
+        all_paths_possible = all(is_path_possible(grid, start[i], goal[i]) for i in range(no_of_robots))
+        if all_paths_possible:
+            break
+
+    else:
+        raise RuntimeError(
+            f"Could not generate a valid grid after {max_attempts} attempts. "
+            "Try reducing obstacle_prob or the number of robots."
+        )
+
     np.savetxt("results/grid.csv", grid, delimiter=",", fmt="%d")
     np.savetxt("results/start.csv", start, delimiter=",", fmt="%d")
     np.savetxt("results/goal.csv", goal, delimiter=",", fmt="%d")
