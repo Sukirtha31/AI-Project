@@ -21,7 +21,7 @@ def is_path_possible(grid, start, goal):
 
     return False
 
-def generate_grid(rows=10, cols=10, obstacle_prob=0.25, ensure_path=True):
+def generate_grid(rows=10, cols=10, obstacle_prob=0.25):
     grid = np.random.choice([0, 1], size=(rows, cols),p=[1 - obstacle_prob, obstacle_prob])
 
     start = (random.randint(0, rows - 1), random.randint(0, cols - 1))
@@ -31,11 +31,10 @@ def generate_grid(rows=10, cols=10, obstacle_prob=0.25, ensure_path=True):
     grid[start] = 0
     grid[goal] = 0
 
-    if ensure_path:
-        while not is_path_possible(grid, start, goal):
-            grid = np.random.choice([0, 1],size=(rows, cols),p=[1 - obstacle_prob, obstacle_prob])
-            grid[start] = 0
-            grid[goal] = 0
+    while not is_path_possible(grid, start, goal):
+        grid = np.random.choice([0, 1],size=(rows, cols),p=[1 - obstacle_prob, obstacle_prob])
+        grid[start] = 0
+        grid[goal] = 0
     
     np.savetxt("results/grid.csv", grid, delimiter=",", fmt="%d")
     np.savetxt("results/start.csv", start, delimiter=",", fmt="%d")
