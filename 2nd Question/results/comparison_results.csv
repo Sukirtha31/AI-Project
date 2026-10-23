@@ -1,0 +1,4 @@
+Algorithm,Solved robots,Success rate (%),Makespan,Total path length,Nodes expanded,Runtime (s),Notes
+Fixed-priority Cooperative A*,4/5,80.0,,,11187,0.1625,Input order is used as priority
+POPS,5/5,100.0,12.0,46.0,121,0.4261,"Orders tested: 8; complete orders: 3; best order: [5, 4, 3, 2, 1]"
+PBS,5/5,100.0,12.0,46.0,131,0.0873,High-level nodes: 4; Collision-free priority-constrained schedule found.
